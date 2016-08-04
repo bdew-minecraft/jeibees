@@ -1,0 +1,20 @@
+[
+{
+  "modid": "jeibees",
+  "name": "JEI Bees",
+  "description": "",
+  "version": "@JEIBEES_VER@",
+  "url": "http://bdew.net/",
+  "updateUrl": "",
+  "authorList": [
+    "bdew"
+  ],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [
+  ],
+  "parent":"",
+  "dependencies": [
+  ]
+}
+]

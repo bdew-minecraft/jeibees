@@ -1,0 +1,172 @@
+buildscript {
+    configurations.all {
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    }
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+        maven {
+            name = "gradle plugins"
+            url = "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.0.7"
+    }
+}
+
+apply plugin: 'scala'
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'com.matthewprenger.cursegradle'
+
+file "build.properties" withReader {
+    def prop = new Properties()
+    prop.load(it)
+    ext.config = new ConfigSlurper().parse prop
+}
+
+if (project.hasProperty('forgeOverride')) {
+    config.forge.version = forgeOverride
+}
+
+if (project.hasProperty('buildnum')) {
+    ext.simpleVersion = "${config.jeibees.version}.${project.buildnum}"
+} else {
+    ext.simpleVersion = "${config.jeibees.version}-DEV"
+}
+
+version = simpleVersion + '-mc' + config.minecraft.version
+
+group = "net.bdew"
+archivesBaseName = "jeibees"
+
+minecraft {
+    version = "${config.minecraft.version}-${config.forge.version}"
+    mappings = "${config.minecraft.mappings}"
+    makeObfSourceJar = false
+    replace("JEIBEES_VER", simpleVersion.toString())
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        name "JEI"
+        url "http://dvs1.progwml6.com/files/maven"
+    }
+    maven {
+        name = "ic2"
+        url = "http://maven.ic2.player.to/"
+    }
+}
+
+dependencies {
+    compile "net.sengir.forestry:forestry_${config.minecraft.version}:${config.forestry.version}:api"
+    deobfCompile "mezz.jei:jei_${config.minecraft.version}:${config.jei.version}"
+}
+
+
+import org.apache.tools.ant.filters.ReplaceTokens
+
+sourceSets {
+    main {
+        scala {
+            srcDir 'src'
+        }
+        resources {
+            srcDir 'resources'
+        }
+    }
+}
+
+processResources {
+    inputs.property "tokens", minecraft.replacements
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+        filter(ReplaceTokens, tokens: minecraft.replacements)
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+task sourceJarReal(type: Jar) {
+    classifier "sources"
+}
+
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    exclude "**/*.psd"
+    classifier "dev"
+    duplicatesStrategy "exclude"
+}
+
+
+jar {
+    exclude "**/*.psd"
+}
+
+afterEvaluate { project ->
+    // Fudge the inputs of api/source jars so we get the version after replacements
+    tasks.getByPath(":sourceJarReal").from(tasks.getByPath(":sourceMainScala").outputs.files)
+}
+
+artifacts {
+    archives sourceJar
+    archives deobfJar
+}
+
+apply plugin: 'maven-publish'
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact deobfJar
+            artifact sourceJarReal
+        }
+    }
+    repositories {
+        maven {
+            url "file://var/www/maven"
+        }
+    }
+}
+
+curseforge {
+    apiKey = project.hasProperty("curseForgeApiKey") ? project.curseForgeApiKey : ""
+    project {
+        id = config.curseforge.id
+
+        releaseType = "alpha"
+        changelog = project.hasProperty("changelog") ? project.changelog : "No changelog available"
+
+        addGameVersion config.minecraft.version
+
+        mainArtifact(jar) {
+            displayName = "JEI Bees ${simpleVersion} (MC ${config.minecraft.version})"
+        }
+
+        addArtifact(deobfJar) {
+            displayName = "JEI Bees ${simpleVersion} Deobfuscated (MC ${config.minecraft.version})"
+        }
+
+        addArtifact(sourceJarReal) {
+            displayName = "JEI Bees ${simpleVersion} Source (MC ${config.minecraft.version})"
+        }
+
+        relations {
+            requiredLibrary 'forestry'
+            requiredLibrary 'just-enough-items-jei'
+        }
+    }
+}
