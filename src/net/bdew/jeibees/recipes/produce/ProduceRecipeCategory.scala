@@ -20,6 +20,7 @@ package net.bdew.jeibees.recipes.produce
 import forestry.api.genetics.ISpeciesRoot
 import mezz.jei.api.IGuiHelper
 import mezz.jei.api.gui.IRecipeLayout
+import mezz.jei.api.ingredients.IIngredients
 import mezz.jei.api.recipe.BlankRecipeCategory
 import net.bdew.jeibees.gui.Slot
 import net.minecraft.client.resources.I18n
@@ -36,20 +37,22 @@ class ProduceRecipeCategory(root: ISpeciesRoot, guiHelper: IGuiHelper) extends B
   override def getTitle = I18n.format(getUid)
   override def getBackground = background
 
-  override def setRecipe(recipeLayout: IRecipeLayout, recipeWrapper: ProduceRecipe): Unit = {
+  override def setRecipe(recipeLayout: IRecipeLayout, recipeWrapper: ProduceRecipe): Unit = setRecipe(recipeLayout, recipeWrapper, null)
+
+  override def setRecipe(recipeLayout: IRecipeLayout, recipeWrapper: ProduceRecipe, ingredients: IIngredients): Unit = {
     val itemStacks = recipeLayout.getItemStacks
 
     itemStacks.init(0, inputSlot.isInput, inputSlot.x, inputSlot.y)
-    itemStacks.setFromRecipe(0, recipeWrapper.input)
+    itemStacks.set(0, recipeWrapper.input)
 
     for ((((stack, chance), Slot(x, y, isInput)), slot) <- recipeWrapper.produceSanitized.take(3).zip(produceSlots).zipWithIndex) {
       itemStacks.init(slot + 1, isInput, x, y)
-      itemStacks.setFromRecipe(slot + 1, stack)
+      itemStacks.set(slot + 1, stack)
     }
 
     for ((((stack, chance), Slot(x, y, isInput)), slot) <- recipeWrapper.specialtySanitized.take(3).zip(specialtySlots).zipWithIndex) {
       itemStacks.init(slot + 4, isInput, x, y)
-      itemStacks.setFromRecipe(slot + 4, stack)
+      itemStacks.set(slot + 4, stack)
     }
   }
 }

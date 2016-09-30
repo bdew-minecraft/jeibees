@@ -20,6 +20,7 @@ package net.bdew.jeibees.recipes.mutation
 import forestry.api.genetics.ISpeciesRoot
 import mezz.jei.api.IGuiHelper
 import mezz.jei.api.gui.IRecipeLayout
+import mezz.jei.api.ingredients.IIngredients
 import mezz.jei.api.recipe.BlankRecipeCategory
 import net.bdew.jeibees.gui.Slot
 import net.minecraft.client.resources.I18n
@@ -35,14 +36,16 @@ class MutationRecipeCategory(root: ISpeciesRoot, guiHelper: IGuiHelper) extends 
   override def getUid = "bdew.jeibees.mutation." + root.getUID
   override def getTitle = I18n.format(getUid)
   override def getBackground = background
-  override def setRecipe(recipeLayout: IRecipeLayout, recipeWrapper: MutationRecipe): Unit = {
+
+  override def setRecipe(recipeLayout: IRecipeLayout, recipeWrapper: MutationRecipe): Unit = setRecipe(recipeLayout, recipeWrapper, null)
+
+  override def setRecipe(recipeLayout: IRecipeLayout, recipeWrapper: MutationRecipe, ingredients: IIngredients): Unit = {
     val itemStacks = recipeLayout.getItemStacks
     slots foreach { case (slot, Slot(x, y, isInput)) =>
       itemStacks.init(slot, isInput, x, y)
     }
-    itemStacks.setFromRecipe(0, recipeWrapper.p1stack)
-    itemStacks.setFromRecipe(1, recipeWrapper.p2stack)
-    itemStacks.setFromRecipe(2, recipeWrapper.resStack)
+    itemStacks.set(0, recipeWrapper.p1stack)
+    itemStacks.set(1, recipeWrapper.p2stack)
+    itemStacks.set(2, recipeWrapper.resStack)
   }
-
 }

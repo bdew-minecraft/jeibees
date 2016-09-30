@@ -19,14 +19,23 @@ package net.bdew.jeibees.misc
 
 import forestry.api.genetics.AlleleManager
 import mezz.jei.api.ISubtypeRegistry.ISubtypeInterpreter
+import net.bdew.jeibees.JEIBees
 import net.minecraft.item.ItemStack
 
 object GeneticSubtypeInterpreter extends ISubtypeInterpreter {
   override def getSubtypeInfo(itemStack: ItemStack): String = {
-    val individual = AlleleManager.alleleRegistry.getIndividual(itemStack)
-    if (individual == null)
-      null
-    else
-      individual.getGenome.getPrimary.getUID
+    if (itemStack.hasTagCompound) {
+      try {
+        val individual = AlleleManager.alleleRegistry.getIndividual(itemStack)
+        if (individual == null)
+          null
+        else
+          individual.getGenome.getPrimary.getUID
+      } catch {
+        case e: Throwable =>
+          JEIBees.logWarnException("Error getting species UID for %s (%s)", e, itemStack.toString, itemStack.getTagCompound.toString)
+          null
+      }
+    } else ""
   }
 }

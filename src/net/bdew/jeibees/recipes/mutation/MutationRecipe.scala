@@ -20,7 +20,7 @@ package net.bdew.jeibees.recipes.mutation
 import com.mojang.realmsclient.gui.ChatFormatting
 import forestry.api.genetics.IMutation
 import net.bdew.jeibees.gui.{BaseRecipe, LabelCentered, LabelHelper}
-import net.bdew.jeibees.misc.GeneticsHelper
+import net.bdew.jeibees.misc.{ExtendedIngredients, GeneticsHelper}
 import net.bdew.jeibees.{Config, JEIBees}
 
 import scala.collection.JavaConversions._
@@ -49,6 +49,8 @@ class MutationRecipe(val mutation: IMutation, val category: MutationRecipeCatego
     addWidget(new LabelCentered(105, 12, "[%.0f%%]".format(mutation.getBaseChance), 0xFFFFFF, toolTip = requirements))
   }
 
-  override def getInputs = GeneticsHelper.getAllItemsFromSpecies(mutation.getAllele0) ++ GeneticsHelper.getAllItemsFromSpecies(mutation.getAllele1)
-  override def getOutputs = GeneticsHelper.getAllItemsFromTemplate(mutation.getRoot, mutation.getTemplate)
+  override def setIngredientsExtended(ingredients: ExtendedIngredients): Unit = {
+    ingredients.setInputLists(List(GeneticsHelper.getAllItemsFromSpecies(mutation.getAllele0), GeneticsHelper.getAllItemsFromSpecies(mutation.getAllele1)))
+    ingredients.setOutputs(GeneticsHelper.getAllItemsFromTemplate(mutation.getRoot, mutation.getTemplate))
+  }
 }

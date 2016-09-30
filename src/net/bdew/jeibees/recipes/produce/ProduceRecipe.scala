@@ -19,9 +19,7 @@ package net.bdew.jeibees.recipes.produce
 
 import forestry.api.genetics.IAlleleSpecies
 import net.bdew.jeibees.gui.{BaseRecipe, LabelCentered, LabelHelper}
-import net.bdew.jeibees.misc.{GeneticsHelper, ItemHelper}
-
-import scala.collection.JavaConversions._
+import net.bdew.jeibees.misc.{ExtendedIngredients, GeneticsHelper, ItemHelper}
 
 class ProduceRecipe(val species: IAlleleSpecies, val category: ProduceRecipeCategory) extends BaseRecipe {
   val (produce, specialty) = GeneticsHelper.getProduceAndSpecialty(species)
@@ -42,6 +40,8 @@ class ProduceRecipe(val species: IAlleleSpecies, val category: ProduceRecipeCate
     addWidget(new LabelCentered(slot.x + 9, slot.y + 19, "%.0f%%".format(chance * 100F), 0xFFFFFFFF))
   }
 
-  override def getInputs = GeneticsHelper.getAllItemsFromSpecies(species)
-  override def getOutputs = produceSanitized.map(_._1) ++ specialtySanitized.map(_._1)
+  override def setIngredientsExtended(ingredients: ExtendedIngredients): Unit = {
+    ingredients.setInputLists(List(GeneticsHelper.getAllItemsFromSpecies(species)))
+    ingredients.setOutputs(produceSanitized.map(_._1) ++ specialtySanitized.map(_._1))
+  }
 }

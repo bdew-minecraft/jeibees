@@ -19,13 +19,14 @@ package net.bdew.jeibees.gui
 
 import java.util
 
-import mezz.jei.api.recipe.IRecipeWrapper
+import mezz.jei.api.ingredients.IIngredients
+import mezz.jei.api.recipe.BlankRecipeWrapper
+import net.bdew.jeibees.misc.ExtendedIngredients
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fluids.FluidStack
 
 import scala.collection.JavaConversions._
 
-abstract class BaseRecipe extends IRecipeWrapper {
+abstract class BaseRecipe extends BlankRecipeWrapper {
   private var widgets = List.empty[RecipeWidget]
 
   def addWidget(widget: RecipeWidget) = widgets :+= widget
@@ -46,7 +47,7 @@ abstract class BaseRecipe extends IRecipeWrapper {
     widgets.foreach(w => w.draw(mouseX - w.x, mouseY - w.y))
   }
 
-  override def drawAnimations(minecraft: Minecraft, recipeWidth: Int, recipeHeight: Int): Unit = {}
-  override def getFluidInputs = List.empty[FluidStack]
-  override def getFluidOutputs = List.empty[FluidStack]
+  def setIngredientsExtended(ingredients: ExtendedIngredients): Unit
+
+  override final def getIngredients(ingredients: IIngredients): Unit = setIngredientsExtended(new ExtendedIngredients(ingredients))
 }
