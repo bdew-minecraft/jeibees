@@ -18,7 +18,7 @@
 package net.bdew.jeibees
 
 import forestry.api.genetics.AlleleManager
-import mezz.jei.api.{BlankModPlugin, IModRegistry, JEIPlugin}
+import mezz.jei.api.{BlankModPlugin, IModRegistry, ISubtypeRegistry, JEIPlugin}
 import net.bdew.jeibees.misc.GeneticSubtypeInterpreter
 import net.bdew.jeibees.recipes.mutation.{MutationRecipe, MutationRecipeCategory, MutationRecipeHandler}
 import net.bdew.jeibees.recipes.produce.{ProduceRecipe, ProduceRecipeCategory, ProduceRecipeHandler}
@@ -42,16 +42,17 @@ class BeesJEIPlugin extends BlankModPlugin {
     new ResourceLocation("forestry", "serumGE")
   )
 
-  override def register(registry: IModRegistry): Unit = {
-    JEIBees.logInfo("JEI Plugin initializing")
-
-    val guiHelper = registry.getJeiHelpers.getGuiHelper
-    val subtypeRegistry = registry.getJeiHelpers.getSubtypeRegistry
-
+  override def registerItemSubtypes(subtypeRegistry: ISubtypeRegistry): Unit = {
     for (id <- geneticsItems; item <- Option(Item.REGISTRY.getObject(id))) {
       subtypeRegistry.registerNbtInterpreter(item, GeneticSubtypeInterpreter)
       JEIBees.logInfo("Added subtype interpreter for: %s (%s)", id, item.getUnlocalizedName)
     }
+  }
+
+  override def register(registry: IModRegistry): Unit = {
+    JEIBees.logInfo("JEI Plugin initializing")
+
+    val guiHelper = registry.getJeiHelpers.getGuiHelper
 
     registry.addRecipeHandlers(MutationRecipeHandler)
     registry.addRecipeHandlers(ProduceRecipeHandler)
