@@ -30,21 +30,18 @@ import scala.collection.JavaConversions._
 @JEIPlugin
 class BeesJEIPlugin extends BlankModPlugin {
   val geneticsItems = List(
-    //    new ResourceLocation("forestry", "beeDroneGE"),
-    //    new ResourceLocation("forestry", "beePrincessGE"),
-    //    new ResourceLocation("forestry", "beeQueenGE"),
-    new ResourceLocation("forestry", "beeLarvaeGE"),
+    new ResourceLocation("forestry", "bee_larvae_ge"),
     new ResourceLocation("forestry", "sapling"),
-    new ResourceLocation("forestry", "pollenFertile"),
-    new ResourceLocation("forestry", "butterflyGE"),
-    new ResourceLocation("forestry", "caterpillarGE"),
-    new ResourceLocation("forestry", "cocoonGE"),
-    new ResourceLocation("forestry", "serumGE")
+    new ResourceLocation("forestry", "pollen_fertile"),
+    new ResourceLocation("forestry", "butterfly_ge"),
+    new ResourceLocation("forestry", "caterpillar_ge"),
+    new ResourceLocation("forestry", "cocoon"),
+    new ResourceLocation("forestry", "serum_ge")
   )
 
   override def registerItemSubtypes(subtypeRegistry: ISubtypeRegistry): Unit = {
     for (id <- geneticsItems; item <- Option(Item.REGISTRY.getObject(id))) {
-      subtypeRegistry.registerNbtInterpreter(item, GeneticSubtypeInterpreter)
+      subtypeRegistry.registerSubtypeInterpreter(item, GeneticSubtypeInterpreter)
       JEIBees.logInfo("Added subtype interpreter for: %s (%s)", id, item.getUnlocalizedName)
     }
   }
