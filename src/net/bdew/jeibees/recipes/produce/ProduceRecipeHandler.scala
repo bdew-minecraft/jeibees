@@ -21,7 +21,6 @@ import mezz.jei.api.recipe.{IRecipeHandler, IRecipeWrapper}
 
 object ProduceRecipeHandler extends IRecipeHandler[ProduceRecipe] {
   override def getRecipeWrapper(recipe: ProduceRecipe): IRecipeWrapper = recipe
-  override def getRecipeCategoryUid: String = null
   override def getRecipeCategoryUid(recipe: ProduceRecipe): String = recipe.category.getUid
   override def isRecipeValid(recipe: ProduceRecipe): Boolean = true
   override def getRecipeClass: Class[ProduceRecipe] = classOf[ProduceRecipe]

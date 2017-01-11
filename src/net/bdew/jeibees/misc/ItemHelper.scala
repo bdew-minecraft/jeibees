@@ -22,8 +22,8 @@ import net.minecraft.item.ItemStack
 
 object ItemHelper {
   def isSameItem(s1: ItemStack, s2: ItemStack): Boolean = {
-    if ((s1 == null) || (s2 == null)) return false
-    if (s1.getItem ne s2.getItem) return false
+    if (s1.isEmpty || s2.isEmpty) return false
+    if (s1.getItem != s2.getItem) return false
     if (s1.getItemDamage != s2.getItemDamage) return false
     if ((s1.getTagCompound == null) && (s2.getTagCompound == null)) return true
     if ((s1.getTagCompound == null) || (s2.getTagCompound == null)) return false
@@ -37,7 +37,7 @@ object ItemHelper {
       var added = false
       for ((mergedStack, mergedChance) <- merged if !added) {
         if (isSameItem(stack, mergedStack) && (chance == mergedChance)) {
-          mergedStack.stackSize += stack.stackSize
+          mergedStack.grow(stack.getCount)
           added = true
         }
       }
@@ -52,10 +52,7 @@ object ItemHelper {
       JEIBees.logWarn("%s returned null", origin)
       Map.empty
     } else {
-      val (bad, good) = drops.partition(x => x._1 == null || x._1.getItem == null)
-      if (bad.nonEmpty)
-        JEIBees.logWarn("%s contains nulls and/or corrupt item stacks", origin)
-      good
+      drops.filter(x => !x._1.isEmpty)
     }
   }
 }

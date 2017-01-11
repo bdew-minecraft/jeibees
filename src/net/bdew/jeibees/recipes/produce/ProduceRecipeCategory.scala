@@ -37,8 +37,6 @@ class ProduceRecipeCategory(root: ISpeciesRoot, guiHelper: IGuiHelper) extends B
   override def getTitle = I18n.format(getUid)
   override def getBackground = background
 
-  override def setRecipe(recipeLayout: IRecipeLayout, recipeWrapper: ProduceRecipe): Unit = setRecipe(recipeLayout, recipeWrapper, null)
-
   override def setRecipe(recipeLayout: IRecipeLayout, recipeWrapper: ProduceRecipe, ingredients: IIngredients): Unit = {
     val itemStacks = recipeLayout.getItemStacks
 

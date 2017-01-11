@@ -37,8 +37,6 @@ class MutationRecipeCategory(root: ISpeciesRoot, guiHelper: IGuiHelper) extends 
   override def getTitle = I18n.format(getUid)
   override def getBackground = background
 
-  override def setRecipe(recipeLayout: IRecipeLayout, recipeWrapper: MutationRecipe): Unit = setRecipe(recipeLayout, recipeWrapper, null)
-
   override def setRecipe(recipeLayout: IRecipeLayout, recipeWrapper: MutationRecipe, ingredients: IIngredients): Unit = {
     val itemStacks = recipeLayout.getItemStacks
     slots foreach { case (slot, Slot(x, y, isInput)) =>
