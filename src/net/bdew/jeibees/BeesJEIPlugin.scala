@@ -17,12 +17,15 @@
 
 package net.bdew.jeibees
 
+import forestry.api.apiculture.IBeeRoot
+import forestry.api.arboriculture.ITreeRoot
 import forestry.api.genetics.AlleleManager
 import mezz.jei.api.{BlankModPlugin, IModRegistry, ISubtypeRegistry, JEIPlugin}
 import net.bdew.jeibees.misc.GeneticSubtypeInterpreter
 import net.bdew.jeibees.recipes.mutation.{MutationRecipe, MutationRecipeCategory, MutationRecipeHandler}
 import net.bdew.jeibees.recipes.produce.{ProduceRecipe, ProduceRecipeCategory, ProduceRecipeHandler}
-import net.minecraft.item.Item
+import net.minecraft.init.Items
+import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.util.ResourceLocation
 
 import scala.collection.JavaConversions._
@@ -58,7 +61,8 @@ class BeesJEIPlugin extends BlankModPlugin {
       val cfg = Config.rootConfigs.getOrElse(root, Config.disabledConfig)
 
       if (cfg.showMutations) {
-        val category = new MutationRecipeCategory(root, guiHelper)
+        val defaultIndividual = root.templateAsIndividual(root.getDefaultTemplate)
+        val category = new MutationRecipeCategory(root, guiHelper, root.getMemberStack(defaultIndividual, root.getIconType))
         var mutations = root.getMutations(false)
         if (!Config.showSecret)
           mutations = mutations.filterNot(_.isSecret)
@@ -71,7 +75,12 @@ class BeesJEIPlugin extends BlankModPlugin {
       }
 
       if (cfg.showProduce) {
-        val category = new ProduceRecipeCategory(root, guiHelper)
+        val produceItem = root match {
+          case _: IBeeRoot => new ItemStack(Item.REGISTRY.getObject(new ResourceLocation("forestry", "bee_combs")))
+          case _: ITreeRoot => new ItemStack(Items.APPLE)
+          case _ => new ItemStack(Items.BUCKET) // Fallback for unknown types
+        }
+        val category = new ProduceRecipeCategory(root, guiHelper, produceItem)
         val species = root.getIndividualTemplates.map(_.getGenome.getPrimary)
         val recipes = species.map(new ProduceRecipe(_, category)).filter(_.hasProducts)
         registry.addRecipeCategories(category)

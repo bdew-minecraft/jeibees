@@ -23,10 +23,12 @@ import mezz.jei.api.gui.IRecipeLayout
 import mezz.jei.api.ingredients.IIngredients
 import mezz.jei.api.recipe.BlankRecipeCategory
 import net.bdew.jeibees.gui.Slot
+import net.bdew.jeibees.misc.ItemStackDrawable
 import net.minecraft.client.resources.I18n
+import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 
-class MutationRecipeCategory(root: ISpeciesRoot, guiHelper: IGuiHelper) extends BlankRecipeCategory[MutationRecipe] {
+class MutationRecipeCategory(root: ISpeciesRoot, guiHelper: IGuiHelper, icon: ItemStack) extends BlankRecipeCategory[MutationRecipe] {
   val slots = Map(
     0 -> Slot(18, 15, true),
     1 -> Slot(71, 15, true),
@@ -36,6 +38,8 @@ class MutationRecipeCategory(root: ISpeciesRoot, guiHelper: IGuiHelper) extends 
   override def getUid = "bdew.jeibees.mutation." + root.getUID
   override def getTitle = I18n.format(getUid)
   override def getBackground = background
+
+  override lazy val getIcon = new ItemStackDrawable(icon)
 
   override def setRecipe(recipeLayout: IRecipeLayout, recipeWrapper: MutationRecipe, ingredients: IIngredients): Unit = {
     val itemStacks = recipeLayout.getItemStacks

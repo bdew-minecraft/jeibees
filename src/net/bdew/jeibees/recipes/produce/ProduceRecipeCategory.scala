@@ -23,10 +23,12 @@ import mezz.jei.api.gui.IRecipeLayout
 import mezz.jei.api.ingredients.IIngredients
 import mezz.jei.api.recipe.BlankRecipeCategory
 import net.bdew.jeibees.gui.Slot
+import net.bdew.jeibees.misc.ItemStackDrawable
 import net.minecraft.client.resources.I18n
+import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 
-class ProduceRecipeCategory(root: ISpeciesRoot, guiHelper: IGuiHelper) extends BlankRecipeCategory[ProduceRecipe] {
+class ProduceRecipeCategory(root: ISpeciesRoot, guiHelper: IGuiHelper, icon: ItemStack) extends BlankRecipeCategory[ProduceRecipe] {
   val inputSlot = Slot(18, 15, true)
   val produceSlots = List(Slot(92, 4, false), Slot(114, 4, false), Slot(136, 4, false))
   val specialtySlots = List(Slot(92, 32, false), Slot(114, 32, false), Slot(136, 32, false))
@@ -36,6 +38,8 @@ class ProduceRecipeCategory(root: ISpeciesRoot, guiHelper: IGuiHelper) extends B
   override def getUid = "bdew.jeibees.produce." + root.getUID
   override def getTitle = I18n.format(getUid)
   override def getBackground = background
+
+  override lazy val getIcon = new ItemStackDrawable(icon)
 
   override def setRecipe(recipeLayout: IRecipeLayout, recipeWrapper: ProduceRecipe, ingredients: IIngredients): Unit = {
     val itemStacks = recipeLayout.getItemStacks
