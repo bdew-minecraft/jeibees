@@ -33,7 +33,7 @@ object ItemHelper {
   def mergeStacks(stacks: Map[ItemStack, Float]): Map[ItemStack, Float] = {
     // There is probably a saner way to do this... but i can't think of it right now.
     var merged = Map.empty[ItemStack, Float]
-    for ((stack, chance) <- stacks if stack != null && stack.getItem != null) {
+    for ((stack, chance) <- stacks if !stack.isEmpty) {
       var added = false
       for ((mergedStack, mergedChance) <- merged if !added) {
         if (isSameItem(stack, mergedStack) && (chance == mergedChance)) {
