@@ -44,7 +44,7 @@ class BeesJEIPlugin extends BlankModPlugin {
 
   override def registerItemSubtypes(subtypeRegistry: ISubtypeRegistry): Unit = {
     for (id <- geneticsItems; item <- Option(Item.REGISTRY.getObject(id))) {
-      subtypeRegistry.registerNbtInterpreter(item, GeneticSubtypeInterpreter)
+      subtypeRegistry.registerSubtypeInterpreter(item, GeneticSubtypeInterpreter)
       JEIBees.logInfo("Added subtype interpreter for: %s (%s)", id, item.getUnlocalizedName)
     }
   }
