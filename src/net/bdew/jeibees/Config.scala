@@ -41,6 +41,7 @@ object Config {
 
       showRequirements = cfg.get("All", "ShowRequirements", true, "Set to false to disable display of mutation requirements").getBoolean
       showSecret = cfg.get("All", "ShowSecret", true, "Set to false to disable display of secret mutations").getBoolean
+      identifyGenome = cfg.get("All", "IdentifyGenome", true, "Set to false to disable showing identified genome in recipes").getBoolean
 
       for ((id, root) <- AlleleManager.alleleRegistry.getSpeciesRoot) {
         val name = id.replace("root", "").capitalize
