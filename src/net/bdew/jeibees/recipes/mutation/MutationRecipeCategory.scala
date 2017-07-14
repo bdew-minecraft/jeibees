@@ -29,25 +29,29 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 
 class MutationRecipeCategory(root: ISpeciesRoot, guiHelper: IGuiHelper, icon: ItemStack) extends BlankRecipeCategory[MutationRecipe] {
-  val slots = Map(
-    0 -> Slot(18, 15, true),
-    1 -> Slot(71, 15, true),
-    2 -> Slot(125, 15, false)
-  )
   val background = guiHelper.createDrawable(new ResourceLocation("jeibees", "textures/recipes.png"), 0, 0, 162, 61)
   override def getUid = "bdew.jeibees.mutation." + root.getUID
   override def getTitle = I18n.format(getUid)
   override def getBackground = background
+  override def getModName: String = "Forestry"
 
   override lazy val getIcon = new ItemStackDrawable(icon)
 
   override def setRecipe(recipeLayout: IRecipeLayout, recipeWrapper: MutationRecipe, ingredients: IIngredients): Unit = {
     val itemStacks = recipeLayout.getItemStacks
-    slots foreach { case (slot, Slot(x, y, isInput)) =>
+    MutationRecipeCategory.slots foreach { case (slot, Slot(x, y, isInput)) =>
       itemStacks.init(slot, isInput, x, y)
     }
     itemStacks.set(0, recipeWrapper.p1stack)
     itemStacks.set(1, recipeWrapper.p2stack)
     itemStacks.set(2, recipeWrapper.resStack)
   }
+}
+
+object MutationRecipeCategory {
+  val slots = Map(
+    0 -> Slot(18, 15, true),
+    1 -> Slot(71, 15, true),
+    2 -> Slot(125, 15, false)
+  )
 }

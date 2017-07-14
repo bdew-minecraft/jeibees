@@ -21,7 +21,7 @@ import forestry.api.genetics.IAlleleSpecies
 import net.bdew.jeibees.gui.{BaseRecipe, LabelCentered, LabelHelper}
 import net.bdew.jeibees.misc.{ExtendedIngredients, GeneticsHelper, ItemHelper}
 
-class ProduceRecipe(val species: IAlleleSpecies, val category: ProduceRecipeCategory) extends BaseRecipe {
+class ProduceRecipe(val species: IAlleleSpecies) extends BaseRecipe {
   val (produce, specialty) = GeneticsHelper.getProduceAndSpecialty(species)
   val produceSanitized = ItemHelper.mergeStacks(ItemHelper.sanitizeDrops(produce, species.getUID + " drops")).toList.sortBy(-_._2)
   val specialtySanitized = ItemHelper.mergeStacks(ItemHelper.sanitizeDrops(specialty, species.getUID + " specialty")).toList.sortBy(-_._2)
@@ -30,13 +30,13 @@ class ProduceRecipe(val species: IAlleleSpecies, val category: ProduceRecipeCate
 
   val input = GeneticsHelper.getItemFromSpecies(species, GeneticsHelper.Position.P1)
 
-  addWidgets(LabelHelper.multilineCentered(category.inputSlot.x + 9, category.inputSlot.y + 22, LabelHelper.splitIfNeeded(species.getName, " "), 0xFFFFFFFF))
+  addWidgets(LabelHelper.multilineCentered(ProduceRecipeCategory.inputSlot.x + 9, ProduceRecipeCategory.inputSlot.y + 22, LabelHelper.splitIfNeeded(species.getAlleleName, " "), 0xFFFFFFFF))
 
-  for (((stack, chance), slot) <- produceSanitized.take(3).zip(category.produceSlots)) {
+  for (((stack, chance), slot) <- produceSanitized.take(3).zip(ProduceRecipeCategory.produceSlots)) {
     addWidget(new LabelCentered(slot.x + 9, slot.y + 19, "%.0f%%".format(chance * 100F), 0xFFFFFFFF))
   }
 
-  for (((stack, chance), slot) <- specialtySanitized.take(3).zip(category.specialtySlots)) {
+  for (((stack, chance), slot) <- specialtySanitized.take(3).zip(ProduceRecipeCategory.specialtySlots)) {
     addWidget(new LabelCentered(slot.x + 9, slot.y + 19, "%.0f%%".format(chance * 100F), 0xFFFFFFFF))
   }
 

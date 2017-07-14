@@ -25,7 +25,7 @@ import net.bdew.jeibees.{Config, JEIBees}
 
 import scala.collection.JavaConversions._
 
-class MutationRecipe(val mutation: IMutation, val category: MutationRecipeCategory) extends BaseRecipe {
+class MutationRecipe(val mutation: IMutation) extends BaseRecipe {
   val p1stack = GeneticsHelper.getItemFromSpecies(mutation.getAllele0, GeneticsHelper.Position.P1)
   val p2stack = GeneticsHelper.getItemFromSpecies(mutation.getAllele1, GeneticsHelper.Position.P2)
   val resStack = GeneticsHelper.getItemFromTemplate(mutation.getRoot, mutation.getTemplate, GeneticsHelper.Position.RES)
@@ -39,9 +39,9 @@ class MutationRecipe(val mutation: IMutation, val category: MutationRecipeCatego
       List(ChatFormatting.RED + "[ERROR!]")
   }
 
-  addWidgets(LabelHelper.multilineCentered(category.slots(0).x + 9, category.slots(0).y + 22, LabelHelper.splitIfNeeded(mutation.getAllele0.getName, " "), 0xFFFFFFFF))
-  addWidgets(LabelHelper.multilineCentered(category.slots(1).x + 9, category.slots(1).y + 22, LabelHelper.splitIfNeeded(mutation.getAllele1.getName, " "), 0xFFFFFFFF))
-  addWidgets(LabelHelper.multilineCentered(category.slots(2).x + 9, category.slots(2).y + 22, LabelHelper.splitIfNeeded(resSpecies.getName, " "), 0xFFFFFFFF))
+  addWidgets(LabelHelper.multilineCentered(MutationRecipeCategory.slots(0).x + 9, MutationRecipeCategory.slots(0).y + 22, LabelHelper.splitIfNeeded(mutation.getAllele0.getAlleleName, " "), 0xFFFFFFFF))
+  addWidgets(LabelHelper.multilineCentered(MutationRecipeCategory.slots(1).x + 9, MutationRecipeCategory.slots(1).y + 22, LabelHelper.splitIfNeeded(mutation.getAllele1.getAlleleName, " "), 0xFFFFFFFF))
+  addWidgets(LabelHelper.multilineCentered(MutationRecipeCategory.slots(2).x + 9, MutationRecipeCategory.slots(2).y + 22, LabelHelper.splitIfNeeded(resSpecies.getAlleleName, " "), 0xFFFFFFFF))
 
   if (requirements.isEmpty || !Config.showRequirements) {
     addWidget(new LabelCentered(105, 12, "%.0f%%".format(mutation.getBaseChance), 0xFFFFFF))

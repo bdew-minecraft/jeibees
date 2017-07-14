@@ -20,10 +20,11 @@ package net.bdew.jeibees
 import forestry.api.apiculture.IBeeRoot
 import forestry.api.arboriculture.ITreeRoot
 import forestry.api.genetics.AlleleManager
+import mezz.jei.api.recipe.IRecipeCategoryRegistration
 import mezz.jei.api.{BlankModPlugin, IModRegistry, ISubtypeRegistry, JEIPlugin}
 import net.bdew.jeibees.misc.GeneticSubtypeInterpreter
-import net.bdew.jeibees.recipes.mutation.{MutationRecipe, MutationRecipeCategory, MutationRecipeHandler}
-import net.bdew.jeibees.recipes.produce.{ProduceRecipe, ProduceRecipeCategory, ProduceRecipeHandler}
+import net.bdew.jeibees.recipes.mutation.{MutationRecipe, MutationRecipeCategory}
+import net.bdew.jeibees.recipes.produce.{ProduceRecipe, ProduceRecipeCategory}
 import net.minecraft.init.Items
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.util.ResourceLocation
@@ -49,42 +50,48 @@ class BeesJEIPlugin extends BlankModPlugin {
     }
   }
 
-  override def register(registry: IModRegistry): Unit = {
-    JEIBees.logInfo("JEI Plugin initializing")
+  lazy val configs = {
+    for (root <- AlleleManager.alleleRegistry.getSpeciesRoot.values())
+      yield root -> Config.rootConfigs.getOrElse(root, Config.disabledConfig)
+  }.toMap
 
+  override def registerCategories(registry: IRecipeCategoryRegistration): Unit = {
     val guiHelper = registry.getJeiHelpers.getGuiHelper
-
-    registry.addRecipeHandlers(MutationRecipeHandler)
-    registry.addRecipeHandlers(ProduceRecipeHandler)
-
-    for ((uid, root) <- AlleleManager.alleleRegistry.getSpeciesRoot) {
-      val cfg = Config.rootConfigs.getOrElse(root, Config.disabledConfig)
-
+    for ((root, cfg) <- configs) {
       if (cfg.showMutations) {
         val defaultIndividual = root.templateAsIndividual(root.getDefaultTemplate)
-        val category = new MutationRecipeCategory(root, guiHelper, root.getMemberStack(defaultIndividual, root.getIconType))
-        var mutations = root.getMutations(false)
-        if (!Config.showSecret)
-          mutations = mutations.filterNot(_.isSecret)
-        val recipes = mutations.map(new MutationRecipe(_, category)).toList
-        registry.addRecipeCategories(category)
-        registry.addRecipes(recipes)
-        JEIBees.logInfo("Added %d mutation recipes for %s", recipes.length, root.getUID.replace("root", ""))
-      } else {
-        JEIBees.logInfo("Not adding mutation recipes for %s - disabled", root.getUID.replace("root", ""))
+        registry.addRecipeCategories(new MutationRecipeCategory(root, guiHelper, root.getMemberStack(defaultIndividual, root.getIconType)))
       }
-
       if (cfg.showProduce) {
         val produceItem = root match {
           case _: IBeeRoot => new ItemStack(Item.REGISTRY.getObject(new ResourceLocation("forestry", "bee_combs")))
           case _: ITreeRoot => new ItemStack(Items.APPLE)
           case _ => new ItemStack(Items.BUCKET) // Fallback for unknown types
         }
-        val category = new ProduceRecipeCategory(root, guiHelper, produceItem)
+        registry.addRecipeCategories(new ProduceRecipeCategory(root, guiHelper, produceItem))
+      }
+    }
+  }
+
+  override def register(registry: IModRegistry): Unit = {
+    JEIBees.logInfo("JEI Plugin initializing")
+
+    for ((root, cfg) <- configs) {
+      if (cfg.showMutations) {
+        var mutations = root.getMutations(false)
+        if (!Config.showSecret)
+          mutations = mutations.filterNot(_.isSecret)
+        val recipes = mutations.map(new MutationRecipe(_)).toList
+        registry.addRecipes(recipes, "bdew.jeibees.mutation." + root.getUID)
+        JEIBees.logInfo("Added %d mutation recipes for %s", recipes.length, root.getUID.replace("root", ""))
+      } else {
+        JEIBees.logInfo("Not adding mutation recipes for %s - disabled", root.getUID.replace("root", ""))
+      }
+
+      if (cfg.showProduce) {
         val species = root.getIndividualTemplates.map(_.getGenome.getPrimary)
-        val recipes = species.map(new ProduceRecipe(_, category)).filter(_.hasProducts)
-        registry.addRecipeCategories(category)
-        registry.addRecipes(recipes)
+        val recipes = species.map(new ProduceRecipe(_)).filter(_.hasProducts)
+        registry.addRecipes(recipes, "bdew.jeibees.produce." + root.getUID)
         JEIBees.logInfo("Added %d produce recipes for %s", recipes.length, root.getUID.replace("root", ""))
       } else {
         JEIBees.logInfo("Not adding produce recipes for %s - disabled", root.getUID.replace("root", ""))

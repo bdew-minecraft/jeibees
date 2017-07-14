@@ -29,32 +29,35 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 
 class ProduceRecipeCategory(root: ISpeciesRoot, guiHelper: IGuiHelper, icon: ItemStack) extends BlankRecipeCategory[ProduceRecipe] {
-  val inputSlot = Slot(18, 15, true)
-  val produceSlots = List(Slot(92, 4, false), Slot(114, 4, false), Slot(136, 4, false))
-  val specialtySlots = List(Slot(92, 32, false), Slot(114, 32, false), Slot(136, 32, false))
-
   val background = guiHelper.createDrawable(new ResourceLocation("jeibees", "textures/recipes.png"), 0, 61, 162, 61)
 
   override def getUid = "bdew.jeibees.produce." + root.getUID
   override def getTitle = I18n.format(getUid)
   override def getBackground = background
+  override def getModName: String = "Forestry"
 
   override lazy val getIcon = new ItemStackDrawable(icon)
 
   override def setRecipe(recipeLayout: IRecipeLayout, recipeWrapper: ProduceRecipe, ingredients: IIngredients): Unit = {
     val itemStacks = recipeLayout.getItemStacks
 
-    itemStacks.init(0, inputSlot.isInput, inputSlot.x, inputSlot.y)
+    itemStacks.init(0, ProduceRecipeCategory.inputSlot.isInput, ProduceRecipeCategory.inputSlot.x, ProduceRecipeCategory.inputSlot.y)
     itemStacks.set(0, recipeWrapper.input)
 
-    for ((((stack, chance), Slot(x, y, isInput)), slot) <- recipeWrapper.produceSanitized.take(3).zip(produceSlots).zipWithIndex) {
+    for ((((stack, chance), Slot(x, y, isInput)), slot) <- recipeWrapper.produceSanitized.take(3).zip(ProduceRecipeCategory.produceSlots).zipWithIndex) {
       itemStacks.init(slot + 1, isInput, x, y)
       itemStacks.set(slot + 1, stack)
     }
 
-    for ((((stack, chance), Slot(x, y, isInput)), slot) <- recipeWrapper.specialtySanitized.take(3).zip(specialtySlots).zipWithIndex) {
+    for ((((stack, chance), Slot(x, y, isInput)), slot) <- recipeWrapper.specialtySanitized.take(3).zip(ProduceRecipeCategory.specialtySlots).zipWithIndex) {
       itemStacks.init(slot + 4, isInput, x, y)
       itemStacks.set(slot + 4, stack)
     }
   }
+}
+
+object ProduceRecipeCategory {
+  val inputSlot = Slot(18, 15, true)
+  val produceSlots = List(Slot(92, 4, false), Slot(114, 4, false), Slot(136, 4, false))
+  val specialtySlots = List(Slot(92, 32, false), Slot(114, 32, false), Slot(136, 32, false))
 }
