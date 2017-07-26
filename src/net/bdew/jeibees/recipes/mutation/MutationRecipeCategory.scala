@@ -21,14 +21,14 @@ import forestry.api.genetics.ISpeciesRoot
 import mezz.jei.api.IGuiHelper
 import mezz.jei.api.gui.IRecipeLayout
 import mezz.jei.api.ingredients.IIngredients
-import mezz.jei.api.recipe.BlankRecipeCategory
+import mezz.jei.api.recipe.IRecipeCategory
 import net.bdew.jeibees.gui.Slot
 import net.bdew.jeibees.misc.ItemStackDrawable
 import net.minecraft.client.resources.I18n
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 
-class MutationRecipeCategory(root: ISpeciesRoot, guiHelper: IGuiHelper, icon: ItemStack) extends BlankRecipeCategory[MutationRecipe] {
+class MutationRecipeCategory(root: ISpeciesRoot, guiHelper: IGuiHelper, icon: ItemStack) extends IRecipeCategory[MutationRecipe] {
   val background = guiHelper.createDrawable(new ResourceLocation("jeibees", "textures/recipes.png"), 0, 0, 162, 61)
   override def getUid = "bdew.jeibees.mutation." + root.getUID
   override def getTitle = I18n.format(getUid)

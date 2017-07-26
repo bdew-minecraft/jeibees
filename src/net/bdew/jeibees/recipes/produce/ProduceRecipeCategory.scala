@@ -21,14 +21,14 @@ import forestry.api.genetics.ISpeciesRoot
 import mezz.jei.api.IGuiHelper
 import mezz.jei.api.gui.IRecipeLayout
 import mezz.jei.api.ingredients.IIngredients
-import mezz.jei.api.recipe.BlankRecipeCategory
+import mezz.jei.api.recipe.IRecipeCategory
 import net.bdew.jeibees.gui.Slot
 import net.bdew.jeibees.misc.ItemStackDrawable
 import net.minecraft.client.resources.I18n
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 
-class ProduceRecipeCategory(root: ISpeciesRoot, guiHelper: IGuiHelper, icon: ItemStack) extends BlankRecipeCategory[ProduceRecipe] {
+class ProduceRecipeCategory(root: ISpeciesRoot, guiHelper: IGuiHelper, icon: ItemStack) extends IRecipeCategory[ProduceRecipe] {
   val background = guiHelper.createDrawable(new ResourceLocation("jeibees", "textures/recipes.png"), 0, 61, 162, 61)
 
   override def getUid = "bdew.jeibees.produce." + root.getUID

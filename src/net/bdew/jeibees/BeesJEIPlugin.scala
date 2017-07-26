@@ -20,8 +20,8 @@ package net.bdew.jeibees
 import forestry.api.apiculture.IBeeRoot
 import forestry.api.arboriculture.ITreeRoot
 import forestry.api.genetics.AlleleManager
+import mezz.jei.api._
 import mezz.jei.api.recipe.IRecipeCategoryRegistration
-import mezz.jei.api.{BlankModPlugin, IModRegistry, ISubtypeRegistry, JEIPlugin}
 import net.bdew.jeibees.misc.GeneticSubtypeInterpreter
 import net.bdew.jeibees.recipes.mutation.{MutationRecipe, MutationRecipeCategory}
 import net.bdew.jeibees.recipes.produce.{ProduceRecipe, ProduceRecipeCategory}
@@ -32,7 +32,7 @@ import net.minecraft.util.ResourceLocation
 import scala.collection.JavaConversions._
 
 @JEIPlugin
-class BeesJEIPlugin extends BlankModPlugin {
+class BeesJEIPlugin extends IModPlugin {
   val geneticsItems = List(
     new ResourceLocation("forestry", "bee_larvae_ge"),
     new ResourceLocation("forestry", "sapling"),

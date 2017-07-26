@@ -21,7 +21,7 @@ import net.minecraft.client.Minecraft
 
 class Label(x: Int, y: Int, text: String, color: Int, shadow: Boolean = false, toolTip: List[String] = List.empty) extends RecipeWidget(x, y, LabelHelper.fontRenderer.getStringWidth(text), LabelHelper.fontRenderer.FONT_HEIGHT) {
   override def draw(mx: Int, my: Int): Unit = {
-    Minecraft.getMinecraft.fontRendererObj.drawString(text, x, y, color, shadow)
+    LabelHelper.fontRenderer.drawString(text, x, y, color, shadow)
   }
   override def clicked(mx: Int, my: Int): Boolean = false
   override def getTooltip(mx: Int, my: Int): List[String] = toolTip
@@ -31,7 +31,7 @@ class LabelCentered(x: Int, y: Int, text: String, color: Int, shadow: Boolean = 
   extends Label(x - (LabelHelper.fontRenderer.getStringWidth(text) / 2), y, text, color, shadow, toolTip)
 
 object LabelHelper {
-  lazy val fontRenderer = Minecraft.getMinecraft.fontRendererObj
+  lazy val fontRenderer = Minecraft.getMinecraft.fontRenderer
 
   def splitIfNeeded(string: String, separator: String) = {
     if (string.contains(separator))

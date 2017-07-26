@@ -20,13 +20,13 @@ package net.bdew.jeibees.gui
 import java.util
 
 import mezz.jei.api.ingredients.IIngredients
-import mezz.jei.api.recipe.BlankRecipeWrapper
+import mezz.jei.api.recipe.IRecipeWrapper
 import net.bdew.jeibees.misc.ExtendedIngredients
 import net.minecraft.client.Minecraft
 
 import scala.collection.JavaConversions._
 
-abstract class BaseRecipe extends BlankRecipeWrapper {
+abstract class BaseRecipe extends IRecipeWrapper {
   private var widgets = List.empty[RecipeWidget]
 
   def addWidget(widget: RecipeWidget) = widgets :+= widget
