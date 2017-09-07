@@ -151,6 +151,7 @@ curseforge {
         changelog = project.hasProperty("changelog") ? project.changelog : "No changelog available"
 
         addGameVersion config.minecraft.version
+        addGameVersion "1.12"
 
         mainArtifact(jar) {
             displayName = "JEI Bees ${simpleVersion} (MC ${config.minecraft.version})"

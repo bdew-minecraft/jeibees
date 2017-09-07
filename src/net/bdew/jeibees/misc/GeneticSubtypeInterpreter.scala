@@ -23,7 +23,7 @@ import net.bdew.jeibees.JEIBees
 import net.minecraft.item.ItemStack
 
 object GeneticSubtypeInterpreter extends ISubtypeInterpreter {
-  override def getSubtypeInfo(itemStack: ItemStack): String = {
+  override def apply(itemStack: ItemStack): String = {
     if (itemStack.hasTagCompound) {
       try {
         val individual = AlleleManager.alleleRegistry.getIndividual(itemStack)
