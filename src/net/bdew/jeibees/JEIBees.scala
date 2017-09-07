@@ -24,7 +24,7 @@ import net.minecraftforge.fml.common.Mod.EventHandler
 import net.minecraftforge.fml.common.event.{FMLInitializationEvent, FMLPostInitializationEvent, FMLPreInitializationEvent}
 import org.apache.logging.log4j.Logger
 
-@Mod(modid = JEIBees.modId, version = "JEIBEES_VER", name = "jeibees", dependencies = "required-after:forestry;required-after:jei", modLanguage = "scala")
+@Mod(modid = JEIBees.modId, version = "JEIBEES_VER", name = "jeibees", dependencies = "required-after:forestry;required-after:jei", modLanguage = "scala", acceptedMinecraftVersions = "[1.12,1.12.1]")
 object JEIBees {
   var log: Logger = _
   var configDir: File = _
