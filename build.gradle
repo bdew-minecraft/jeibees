@@ -152,6 +152,7 @@ curseforge {
 
         addGameVersion config.minecraft.version
         addGameVersion "1.12"
+        addGameVersion "1.12.1"
 
         mainArtifact(jar) {
             displayName = "JEI Bees ${simpleVersion} (MC ${config.minecraft.version})"
