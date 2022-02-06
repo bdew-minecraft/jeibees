@@ -1,0 +1,36 @@
+modLoader = "kotori_scala"
+loaderVersion = "[2.13.5,2.14.0)"
+issueTrackerURL = "https://github.com/bdew-minecraft/jeibees/issues"
+license = "LGPL"
+
+[[mods]]
+modId = "jeibees"
+version = "${file.jarVersion}"
+displayName = "JEI Bees"
+displayURL = "https://www.curseforge.com/minecraft/mc-mods/jei-bees"
+authors = "bdew"
+description = '''
+This mod adds JEI recipes that show breeding and products from Forestry bees, trees and butterflies.
+'''
+
+[[dependencies.jeibees]]
+modId = "forge"
+mandatory = true
+versionRange = "[36.2,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.jeibees]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.16.5,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.jeibees]]
+modId = "forestry"
+mandatory = true
+versionRange = "[6.0,)"
+ordering = "NONE"
+side = "BOTH"
+

@@ -1,33 +1,19 @@
-/*
- * Copyright (c) bdew, 2016 - 2017
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package net.bdew.jeibees.misc
 
 import net.bdew.jeibees.JEIBees
 import net.minecraft.item.ItemStack
 
+import java.util.Collections
+import scala.jdk.CollectionConverters._
+
 object ItemHelper {
   def isSameItem(s1: ItemStack, s2: ItemStack): Boolean = {
     if (s1.isEmpty || s2.isEmpty) return false
     if (s1.getItem != s2.getItem) return false
-    if (s1.getItemDamage != s2.getItemDamage) return false
-    if ((s1.getTagCompound == null) && (s2.getTagCompound == null)) return true
-    if ((s1.getTagCompound == null) || (s2.getTagCompound == null)) return false
-    return s1.getTagCompound == s2.getTagCompound
+    if (s1.getDamageValue != s2.getDamageValue) return false
+    if ((s1.getTag == null) && (s2.getTag == null)) return true
+    if ((s1.getTag == null) || (s2.getTag == null)) return false
+    return s1.getTag == s2.getTag
   }
 
   def mergeStacks(stacks: Map[ItemStack, Float]): Map[ItemStack, Float] = {
@@ -54,5 +40,16 @@ object ItemHelper {
     } else {
       drops.filter(x => !x._1.isEmpty)
     }
+  }
+
+  def outputsList(drops: List[(ItemStack, Float)], slots: Int): List[java.util.List[ItemStack]] = {
+    if (drops.size <= slots) return drops.map(x => Collections.singletonList(x._1))
+    val grouped = drops.groupBy(_._2).toList.sortBy(-_._1)
+    if (grouped.size <= slots) {
+      return grouped.map(_._2.map(_._1).asJava)
+    }
+    val first = grouped.take(slots - 1).map(_._2.map(_._1).asJava)
+    val rest = grouped.drop(slots - 1).flatMap(_._2).map(_._1).asJava
+    first :+ rest
   }
 }

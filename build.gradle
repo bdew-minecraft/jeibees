@@ -1,32 +1,21 @@
 buildscript {
-    configurations.all {
-        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-    }
     repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
         mavenCentral()
-        mavenLocal()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
-        maven {
-            name = "gradle plugins"
-            url = "https://plugins.gradle.org/m2/"
-        }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-        classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.0.9"
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
     }
 }
 
+plugins {
+    id "com.matthewprenger.cursegradle" version "1.4.0"
+}
+
 apply plugin: 'scala'
-apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'com.matthewprenger.cursegradle'
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
 
 file "build.properties" withReader {
     def prop = new Properties()
@@ -34,105 +23,117 @@ file "build.properties" withReader {
     ext.config = new ConfigSlurper().parse prop
 }
 
-if (project.hasProperty('forgeOverride')) {
-    config.forge.version = forgeOverride
-}
-
 if (project.hasProperty('buildnum')) {
-    ext.simpleVersion = "${config.jeibees.version}.${project.buildnum}"
+    ext.simpleVersion = "${config.mod.version}.${project.buildnum}"
 } else {
-    ext.simpleVersion = "${config.jeibees.version}-DEV"
+    ext.simpleVersion = "${config.mod.version}-DEV"
 }
 
 version = simpleVersion + '-mc' + config.minecraft.version
 
-group = "net.bdew"
-archivesBaseName = "jeibees"
+group = 'net.bdew'
+archivesBaseName = config.mod.id
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 minecraft {
-    version = "${config.minecraft.version}-${config.forge.version}"
-    mappings = "${config.minecraft.mappings}"
-    makeObfSourceJar = false
-    replace("JEIBEES_VER", simpleVersion.toString())
+    mappings channel: 'official', version: config.minecraft.version
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            mods {
+                register(config.mod.id) {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                register(config.mod.id) {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        data {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            args '--mod', config.mod.id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            mods {
+                register(config.mod.id) {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
 }
 
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
 repositories {
-    mavenCentral()
-    mavenLocal()
     maven {
-        name "JEI"
-        url "http://dvs1.progwml6.com/files/maven"
+        name = "Azure-SLP"
+        url = uri("https://pkgs.dev.azure.com/Kotori316/minecraft/_packaging/mods/maven/v1")
+        content {
+            includeModule("com.kotori316", "ScalableCatsForce".toLowerCase())
+        }
     }
     maven {
-        name = "ic2"
-        url = "http://maven.ic2.player.to/"
+        name = "ModMaven"
+        url = "https://modmaven.dev"
+    }
+    repositories.stream().filter { it instanceof MavenArtifactRepository }.forEach { repo ->
+        repo.content {
+            excludeVersionByRegex(".*", ".*", ".*_mapped_snapshot_.*")
+        }
     }
 }
 
 dependencies {
-    compile "net.sengir.forestry:forestry_${config.minecraft.version}:${config.forestry.version}:api"
-    deobfCompile "mezz.jei:jei_${config.minecraft.version}:${config.jei.version}"
-}
+    minecraft(group: 'net.minecraftforge', name: 'forge', version: "${config.minecraft.version}-${config.forge.version}")
 
+    implementation(group: 'org.scala-lang', name: 'scala-library', version: config.scala.version)
+    implementation(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: config.slp.version, classifier: 'dev')
 
-import org.apache.tools.ant.filters.ReplaceTokens
-
-sourceSets {
-    main {
-        scala {
-            srcDir 'src'
-        }
-        resources {
-            srcDir 'resources'
-        }
-    }
-}
-
-processResources {
-    inputs.property "tokens", minecraft.replacements
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-        filter(ReplaceTokens, tokens: minecraft.replacements)
+    implementation fg.deobf("net.sengir.forestry:forestry-${config.minecraft.version}:${config.forestry.version}") {
+        transitive(false)
     }
 
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
-}
+    compileOnly fg.deobf("mezz.jei:jei-${config.minecraft.version}:${config.jei.version}:api")
 
-task sourceJarReal(type: Jar) {
-    classifier "sources"
+    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:$config.patchouli.version")
+    runtimeOnly fg.deobf("mezz.jei:jei-${config.minecraft.version}:${config.jei.version}")
 }
-
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    exclude "**/*.psd"
-    classifier "dev"
-    duplicatesStrategy "exclude"
-}
-
 
 jar {
-    exclude "**/*.psd"
+    manifest {
+        attributes([
+                "Specification-Title"     : config.mod.id,
+                "Specification-Vendor"    : "bdew",
+                "Specification-Version"   : "1",
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : simpleVersion,
+                "Implementation-Vendor"   : "bdew",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
 }
 
-afterEvaluate { project ->
-    // Fudge the inputs of api/source jars so we get the version after replacements
-    tasks.getByPath(":sourceJarReal").from(tasks.getByPath(":sourceMainScala").outputs.files)
-}
-
-artifacts {
-    archives sourceJar
-    archives deobfJar
-}
-
-apply plugin: 'maven-publish'
+jar.finalizedBy('reobfJar')
 
 publishing {
     publications {
         maven(MavenPublication) {
-            artifact deobfJar
-            artifact sourceJarReal
+            artifact jar
         }
     }
     repositories {
@@ -151,24 +152,15 @@ curseforge {
         changelog = project.hasProperty("changelog") ? project.changelog : "No changelog available"
 
         addGameVersion config.minecraft.version
-        addGameVersion "1.12"
-        addGameVersion "1.12.1"
 
         mainArtifact(jar) {
             displayName = "JEI Bees ${simpleVersion} (MC ${config.minecraft.version})"
         }
 
-        addArtifact(deobfJar) {
-            displayName = "JEI Bees ${simpleVersion} Deobfuscated (MC ${config.minecraft.version})"
-        }
-
-        addArtifact(sourceJarReal) {
-            displayName = "JEI Bees ${simpleVersion} Source (MC ${config.minecraft.version})"
-        }
-
         relations {
-            requiredLibrary 'forestry'
-            requiredLibrary 'just-enough-items-jei'
+            requiredDependency 'scalable-cats-force'
+            requiredDependency 'forestry'
+            requiredDependency 'jei'
         }
     }
 }
