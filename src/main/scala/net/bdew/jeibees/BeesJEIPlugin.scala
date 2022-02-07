@@ -34,7 +34,6 @@ class BeesJEIPlugin extends IModPlugin {
         JEIBees.logInfo(s"Skipping mutations for ${root.getUID} due to config")
       }
 
-
       if (Config.shouldShowProduce(root)) {
         val iconItem = root match {
           case _: IBeeRoot => new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("forestry", "bee_comb_honey")))

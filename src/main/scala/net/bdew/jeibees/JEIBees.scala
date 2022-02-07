@@ -1,7 +1,11 @@
 package net.bdew.jeibees
 
 import net.minecraftforge.fml.common.Mod
+import net.minecraftforge.fml.{ExtensionPoint, ModLoadingContext}
+import org.apache.commons.lang3.tuple.Pair
 import org.apache.logging.log4j.{LogManager, Logger}
+
+import java.util.function.{BiPredicate, Supplier}
 
 @Mod(JEIBees.ModId)
 object JEIBees {
@@ -16,4 +20,7 @@ object JEIBees {
   def logErrorException(msg: String, t: Throwable, args: Any*): Unit = log.error(msg.format(args: _*), t)
 
   Config.init()
+
+  ModLoadingContext.get.registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () =>
+    Pair.of(() => "ANY", (remote, isServer) => true): Pair[Supplier[String], BiPredicate[String, java.lang.Boolean]])
 }
