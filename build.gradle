@@ -104,11 +104,15 @@ dependencies {
     implementation(group: 'org.scala-lang', name: 'scala-library', version: config.scala.version)
     implementation(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: config.slp.version, classifier: 'dev')
 
-    implementation fg.deobf("net.sengir.forestry:forestry-${config.minecraft.version}:${config.forestry.version}") {
+    compileOnly fg.deobf("net.sengir.forestry:forestry-${config.minecraft.version}:${config.forestry.version}:api") {
         transitive(false)
     }
 
     compileOnly fg.deobf("mezz.jei:jei-${config.minecraft.version}:${config.jei.version}:api")
+
+    runtimeOnly fg.deobf("net.sengir.forestry:forestry-${config.minecraft.version}:${config.forestry.version}") {
+        transitive(false)
+    }
 
     runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:$config.patchouli.version")
     runtimeOnly fg.deobf("mezz.jei:jei-${config.minecraft.version}:${config.jei.version}")
